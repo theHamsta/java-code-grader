@@ -18,6 +18,7 @@ from pprint import pprint
 from pygments import highlight
 from pygments.formatters import LatexFormatter
 import jinja2
+from shutil import copy
 
 from code_grader.lexer import CustomJavaLexer
 
@@ -40,7 +41,6 @@ def create_grading(files):
     scored_points = 0
     file_points = {}
 
-    breakpoint()
     for filename in files:
         with open(filename) as f:
             content = f.read()
@@ -167,6 +167,8 @@ def create_pdf(filenames, working_dir):
         else:
             pass
 
+        return pdf_file
+
     else:
         print(f"Failed to find generated PDF ({pdf_file})")
 
@@ -181,7 +183,12 @@ def main():
 
     assert args.language == 'java', 'Only supported language at the moment'
 
-    create_pdf(args.source_files, args.input_folder)
+    pdf_file = create_pdf(args.source_files, args.input_folder)
+    try:
+       copy(pdf_file, join(args.input_folder, 'scoring.pdf'))
+    except Exception:
+       pass
+
 
 
 if __name__ == '__main__':
