@@ -7,16 +7,65 @@
 """
 
 import argparse
+import re
 import subprocess
 import sys
 import tempfile
 from glob import escape, glob
 from os.path import basename, dirname, exists, join
+from pprint import pprint
 
 from pygments import highlight
 from pygments.formatters import LatexFormatter
+import jinja2
 
 from code_grader.lexer import CustomJavaLexer
+
+SCORING_REGEX = re.compile(
+    r"//\s*\[(.*)\s*:\s*([0-9.]+)\s*/\s*([0-9.]+)\s*points\]")
+
+
+class ScoringResult:
+    def __init__(self, scored_points, total_points, file_points):
+        self.scored_points = scored_points
+        self.total_points = total_points
+        self.file_points = file_points
+
+    def __str__(self):
+        return f"""{self.__class__,__name__}: {self.scored_points}/{self.total_points}: {self.file_points}"""
+
+
+def create_grading(files):
+    total_points = 0
+    scored_points = 0
+    file_points = {}
+
+    breakpoint()
+    for filename in files:
+        with open(filename) as f:
+            content = f.read()
+            
+            filename = basename(filename)
+            file_points[filename] = {}
+            file_points[filename]['tasks'] = []
+            file_points[filename]['scored_points'] = 0
+            file_points[filename]['max_points'] = 0
+
+            for (task, points, max_points) in SCORING_REGEX.findall(content):
+                points = float(points)
+                max_points = float(max_points)
+
+                print(f'{task}: {points} of {max_points}')
+                file_points[filename]['tasks'].append(
+                    (task, points, max_points))
+
+                scored_points += points
+                total_points += max_points
+
+                file_points[filename]['scored_points'] += points
+                file_points[filename]['max_points'] += max_points
+
+    return ScoringResult(scored_points, total_points, file_points)
 
 
 def create_tex_file(filenames, working_dir):
@@ -24,10 +73,15 @@ def create_tex_file(filenames, working_dir):
 
     relevant_files = list(filter(lambda x: basename(x) in filenames,
                                  all_files))
+
     if not relevant_files:
         return None
     else:
         print(f"Found files: {relevant_files}")
+
+    scoring = create_grading(relevant_files)
+    print(scoring)
+    pprint(scoring.file_points)
 
     formatter = LatexFormatter(style='friendly',
                                title="This is a title",
@@ -50,10 +104,28 @@ def create_tex_file(filenames, working_dir):
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{minted} 
+
+\setlength{\parindent}{0cm}
+\renewcommand{\familydefault}{\sfdefault}
 ''')
     doctext.append(formatter.get_style_defs())
     doctext.append(r"""
 \begin{document}""")
+
+    doctext.append(jinja2.Template(r"""
+
+\section*{Scoring}
+
+{% for file, scoring in file_points.items() %}
+\paragraph{ {{file}}: {{scoring.scored_points}} / {{scoring.max_points}} }
+\begin{itemize}
+{% for task in scoring.tasks %}
+    \item {{ task[0] }} : {{task[1]}} / {{task[2]}}
+{% endfor %}
+\end{itemize}
+{% endfor %}
+\paragraph{ Total: {{scored_points}} / {{total_points}} }
+""").render(scoring.__dict__))
 
     for filename in relevant_files:
         with open(filename) as f:
