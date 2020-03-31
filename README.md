@@ -1,8 +1,8 @@
 # code-grader
 
-Generate a PDF of graded source files as a feed back for students
+Generate a PDF of graded source files as a feedback for students
 
-# Installation
+## Installation
 
 - Please ensure that **latexmk** is in `$PATH`!
 - We use the `minted` and the `geometry` LaTeX package
