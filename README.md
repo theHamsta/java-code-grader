@@ -1,6 +1,6 @@
 # code-grader
 
-Generate PDF of graded source files as a feed back for students
+Generate a PDF of graded source files as a feed back for students
 
 # Installation
 
