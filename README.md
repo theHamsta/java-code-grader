@@ -32,4 +32,4 @@ code-grader -h
 Comment your code with 
 
  - `/// <-` Hint for the students
- - `[task blub: X/Y points]` Grading for a subtask
+ - `// [task blub: X/Y points]` Grading for a subtask
