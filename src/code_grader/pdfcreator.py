@@ -120,7 +120,7 @@ def create_tex_file(filenames, working_dir):
 \paragraph{ {{file}}: {{scoring.scored_points}} / {{scoring.max_points}} }
 \begin{itemize}
 {% for task in scoring.tasks %}
-    \item {{ task[0] }} : {{task[1]}} / {{task[2]}}
+    \item {{ task[0] }}: {{task[1]}} / {{task[2]}}
 {% endfor %}
 \end{itemize}
 {% endfor %}
