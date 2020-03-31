@@ -14,11 +14,11 @@ import tempfile
 from glob import escape, glob
 from os.path import basename, dirname, exists, join
 from pprint import pprint
+from shutil import copy
 
+import jinja2
 from pygments import highlight
 from pygments.formatters import LatexFormatter
-import jinja2
-from shutil import copy
 
 from code_grader.lexer import CustomJavaLexer
 
@@ -44,7 +44,7 @@ def create_grading(files):
     for filename in files:
         with open(filename) as f:
             content = f.read()
-            
+
             filename = basename(filename)
             file_points[filename] = {}
             file_points[filename]['tasks'] = []
@@ -112,7 +112,8 @@ def create_tex_file(filenames, working_dir):
     doctext.append(r"""
 \begin{document}""")
 
-    doctext.append(jinja2.Template(r"""
+    doctext.append(
+        jinja2.Template(r"""
 
 \section*{Scoring}
 
@@ -185,10 +186,9 @@ def main():
 
     pdf_file = create_pdf(args.source_files, args.input_folder)
     try:
-       copy(pdf_file, join(args.input_folder, 'scoring.pdf'))
+        copy(pdf_file, join(args.input_folder, 'scoring.pdf'))
     except Exception:
-       pass
-
+        pass
 
 
 if __name__ == '__main__':
