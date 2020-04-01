@@ -152,7 +152,7 @@ def create_pdf(filenames, working_dir):
         tex_file = f.name
 
     cmd = [
-        "latexmk", "-pdf", "-shell-escape", "-verbose", "-file-line-error",
+        "latexmk", "-silent", "-pdf", "-shell-escape", "-file-line-error",
         "-synctex=1", "-interaction=nonstopmode", tex_file
     ]
     print(f"Running \"{' '.join(cmd)}\" ...")
