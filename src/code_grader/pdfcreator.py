@@ -12,7 +12,7 @@ import subprocess
 import sys
 import tempfile
 from glob import escape, glob
-from os.path import basename, dirname, exists, join
+from os.path import basename, dirname, exists, join, startfile
 from pprint import pprint
 from shutil import copy
 
@@ -151,10 +151,15 @@ def create_pdf(filenames, working_dir):
         f.write(tex_code)
         tex_file = f.name
 
-    cmd = [
-        "latexmk", "-silent", "-pdf", "-shell-escape", "-file-line-error",
-        "-synctex=1", "-interaction=nonstopmode", tex_file
-    ]
+    if sys.platform in ('linux', 'darwin'):
+        cmd = [
+            "latexmk", "-silent", "-pdf", "-shell-escape", "-file-line-error",
+            "-synctex=1", "-interaction=nonstopmode", tex_file
+        ]
+    elif sys.platform == 'win32':
+        cmd = ["pdflatex","-shell-escape", "-interaction=nonstopmode", tex_file]
+
+
     print(f"Running \"{' '.join(cmd)}\" ...")
     subprocess.call(cmd, cwd=dirname(tex_file))
 
@@ -165,6 +170,8 @@ def create_pdf(filenames, working_dir):
             subprocess.call(["open", pdf_file])
         elif sys.platform == 'linux':
             subprocess.call(["xdg-open", pdf_file])
+        elif sys.platform == 'win32':
+            startfile(pdf_file)
         else:
             pass
 
