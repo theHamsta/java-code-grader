@@ -9,7 +9,7 @@ Generate a PDF of graded source files as a feedback for students
 - Install this package
 
 ```bash
-pip3 install -e code-grader
+pip3 install -e .
 ```
 
 ## Usage
