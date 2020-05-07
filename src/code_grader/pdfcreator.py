@@ -208,6 +208,7 @@ def main():
         for subdir in os.listdir(args.input_folder):
             subdir = os.path.join(args.input_folder, subdir)
             if os.path.isdir(subdir):
+                 print(f'Analyzing folder "{subdir}"')
                  pdf_file, scoring = create_pdf(args.source_files, subdir, args.silent)
                  if scoring and scoring.total_points != args.total_points:
                      print(f'[red]Score is {scoring.total_points} but should be {args.total_points}![/red]')
