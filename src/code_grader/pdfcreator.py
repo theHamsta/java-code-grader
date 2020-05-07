@@ -12,7 +12,14 @@ import subprocess
 import sys
 import tempfile
 from glob import escape, glob
-from os.path import basename, dirname, exists, join, startfile
+from os.path import basename, dirname, exists, join
+import os
+from warnings import warn
+try:
+    from rich import print
+except Exception:
+    pass
+
 from pprint import pprint
 from shutil import copy
 
@@ -75,7 +82,7 @@ def create_tex_file(filenames, working_dir):
                                  all_files))
 
     if not relevant_files:
-        return None
+        return None, None
     else:
         print(f"Found files: {relevant_files}")
 
@@ -136,16 +143,17 @@ def create_tex_file(filenames, working_dir):
 
     doctext.append(r"\end{document}")
 
-    return '\n'.join(doctext)
+    return '\n'.join(doctext), scoring
 
 
-def create_pdf(filenames, working_dir):
+def create_pdf(filenames, working_dir, silent=False):
 
     print(f"Creating LaTeX code...")
-    tex_code = create_tex_file(filenames, working_dir)
+    tex_code, scoring = create_tex_file(filenames, working_dir)
 
     if not tex_code:
         print("No tex code generated")
+        return None, None
 
     with tempfile.NamedTemporaryFile('w', suffix='.tex', delete=False) as f:
         f.write(tex_code)
@@ -166,16 +174,18 @@ def create_pdf(filenames, working_dir):
     pdf_file = tex_file.replace('.tex', '.pdf')
     if exists(pdf_file):
         print(f"Finished: {pdf_file}")
-        if sys.platform == 'darwin':
-            subprocess.call(["open", pdf_file])
-        elif sys.platform == 'linux':
-            subprocess.call(["xdg-open", pdf_file])
-        elif sys.platform == 'win32':
-            startfile(pdf_file)
-        else:
-            pass
 
-        return pdf_file
+        if not silent:
+          if sys.platform == 'darwin':
+              subprocess.call(["open", pdf_file])
+          elif sys.platform == 'linux':
+              subprocess.call(["xdg-open", pdf_file])
+          elif sys.platform == 'win32':
+              os.startfile(pdf_file)
+          else:
+              pass
+
+        return pdf_file, scoring
 
     else:
         print(f"Failed to find generated PDF ({pdf_file})")
@@ -187,15 +197,32 @@ def main():
     parser.add_argument('--input_folder', default='.')
     parser.add_argument('source_files', nargs='+')
     parser.add_argument('--language', default='java')
+    parser.add_argument('--silent', action='store_true')
+    parser.add_argument('--batch-grade', action='store_true')
+    parser.add_argument('--total-points', type=float, default=10)
     args = parser.parse_args()
 
     assert args.language == 'java', 'Only supported language at the moment'
 
-    pdf_file = create_pdf(args.source_files, args.input_folder)
-    try:
-        copy(pdf_file, join(args.input_folder, 'scoring.pdf'))
-    except Exception:
-        pass
+    if args.batch_grade:
+        for subdir in os.listdir(args.input_folder):
+            subdir = os.path.join(args.input_folder, subdir)
+            if os.path.isdir(subdir):
+                 pdf_file, scoring = create_pdf(args.source_files, subdir, args.silent)
+                 if scoring and scoring.total_points != args.total_points:
+                     print(f'[red]Score is {scoring.total_points} but should be {args.total_points}![/red]')
+                 try:
+                     copy(pdf_file, join(args.input_folder, basename(subdir) + '_scoring.pdf'))
+                 except Exception:
+                     pass
+    else:
+        pdf_file, scoring = create_pdf(args.source_files, args.input_folder, args.silent)
+        if scoring and scoring.total_points != args.total_points:
+            print(f'[red]Score is {scoring.total_points} but should be {args.total_points}![/red]')
+        try:
+            copy(pdf_file, join(args.input_folder, 'scoring.pdf'))
+        except Exception:
+            pass
 
 
 if __name__ == '__main__':
