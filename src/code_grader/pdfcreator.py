@@ -43,6 +43,17 @@ class ScoringResult:
         return f"""{self.__class__,__name__}: {self.scored_points}/{self.total_points}: {self.file_points}"""
 
 
+def open_pdf(path):
+    if sys.platform == 'darwin':
+        subprocess.call(["open", path])
+    elif sys.platform == 'linux':
+        subprocess.call(["xdg-open", path])
+    elif sys.platform == 'win32':
+        os.startfile(path)
+    else:
+        pass
+
+
 def create_grading(files):
     total_points = 0
     scored_points = 0
@@ -165,8 +176,7 @@ def create_pdf(filenames, working_dir, silent=False):
             "-synctex=1", "-interaction=nonstopmode", tex_file
         ]
     elif sys.platform == 'win32':
-        cmd = ["pdflatex","-shell-escape", "-interaction=nonstopmode", tex_file]
-
+        cmd = ["pdflatex", "-shell-escape", "-interaction=nonstopmode", tex_file]
 
     print(f"Running \"{' '.join(cmd)}\" ...")
     subprocess.call(cmd, cwd=dirname(tex_file))
@@ -174,17 +184,6 @@ def create_pdf(filenames, working_dir, silent=False):
     pdf_file = tex_file.replace('.tex', '.pdf')
     if exists(pdf_file):
         print(f"Finished: {pdf_file}")
-
-        if not silent:
-          if sys.platform == 'darwin':
-              subprocess.call(["open", pdf_file])
-          elif sys.platform == 'linux':
-              subprocess.call(["xdg-open", pdf_file])
-          elif sys.platform == 'win32':
-              os.startfile(pdf_file)
-          else:
-              pass
-
         return pdf_file, scoring
 
     else:
@@ -208,20 +207,26 @@ def main():
         for subdir in os.listdir(args.input_folder):
             subdir = os.path.join(args.input_folder, subdir)
             if os.path.isdir(subdir):
-                 print(f'Analyzing folder "{subdir}"')
-                 pdf_file, scoring = create_pdf(args.source_files, subdir, args.silent)
-                 if scoring and scoring.total_points != args.total_points:
-                     print(f'[red]Score is {scoring.total_points} but should be {args.total_points}![/red]')
-                 try:
-                     copy(pdf_file, join(args.input_folder, basename(subdir) + '_scoring.pdf'))
-                 except Exception:
-                     pass
+                print(f'Analyzing folder "{subdir}"')
+                pdf_file, scoring = create_pdf(args.source_files, subdir, args.silent)
+                if scoring and scoring.total_points != args.total_points:
+                    print(f'[red]Score is {scoring.total_points} but should be {args.total_points}![/red]')
+                try:
+                    target_file = join(args.input_folder, basename(subdir) + '_scoring.pdf')
+                    copy(pdf_file, target_file)
+                    if not args.silent:
+                        open_pdf(target_file)
+                except Exception:
+                    pass
     else:
         pdf_file, scoring = create_pdf(args.source_files, args.input_folder, args.silent)
         if scoring and scoring.total_points != args.total_points:
             print(f'[red]Score is {scoring.total_points} but should be {args.total_points}![/red]')
         try:
-            copy(pdf_file, join(args.input_folder, 'scoring.pdf'))
+            target_file = join(args.input_folder, 'scoring.pdf')
+            copy(pdf_file, target_file)
+            if not args.silent:
+                open_pdf(target_file)
         except Exception:
             pass
 
