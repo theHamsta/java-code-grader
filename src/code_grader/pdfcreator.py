@@ -30,7 +30,7 @@ from pygments.formatters import LatexFormatter
 from code_grader.lexer import CustomJavaLexer
 
 SCORING_REGEX = re.compile(
-    r"//\s*\[(.*)\s*:\s*([0-9.]+)\s*/\s*([0-9.]+)\s*points\]")
+    r"//\s*\[(.*)\s*:\s*([0-9.]+)\s*/\s*([0-9.]+)\s*(points)?\]")
 
 
 class ScoringResult:
@@ -69,7 +69,7 @@ def create_grading(files):
             file_points[filename]['scored_points'] = 0
             file_points[filename]['max_points'] = 0
 
-            for (task, points, max_points) in SCORING_REGEX.findall(content):
+            for (task, points, max_points, _) in SCORING_REGEX.findall(content):
                 points = float(points)
                 max_points = float(max_points)
 
@@ -188,6 +188,7 @@ def create_pdf(filenames, working_dir, silent=False):
 
     else:
         print(f"Failed to find generated PDF ({pdf_file})")
+        return None, None
 
 
 def main():
