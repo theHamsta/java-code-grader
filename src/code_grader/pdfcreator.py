@@ -30,7 +30,7 @@ from pygments.formatters import LatexFormatter
 from code_grader.lexer import CustomJavaLexer
 
 SCORING_REGEX = re.compile(
-    r"//\s*\[(.*)\s*:\s*([0-9.]+)\s*/\s*([0-9.]+)\s*(points)?\]")
+    r"//\s*\[(.*)\s*:\s*([0-9.,]+)\s*/\s*([0-9.,]+)\s*(points|Points)?\]")
 
 
 class ScoringResult:
@@ -60,7 +60,7 @@ def create_grading(files):
     file_points = {}
 
     for filename in files:
-        with open(filename) as f:
+        with open(filename, 'r', encoding='ascii', errors='ignore') as f:
             content = f.read()
 
             filename = basename(filename)
@@ -70,7 +70,7 @@ def create_grading(files):
             file_points[filename]['max_points'] = 0
 
             for (task, points, max_points, _) in SCORING_REGEX.findall(content):
-                points = float(points)
+                points = float(points.replace(',', '.'))
                 max_points = float(max_points)
 
                 print(f'{task}: {points} of {max_points}')
@@ -147,7 +147,7 @@ def create_tex_file(filenames, working_dir):
 """).render(scoring.__dict__))
 
     for filename in relevant_files:
-        with open(filename) as f:
+        with open(filename, 'r'  , encoding="utf-8",errors="ignore") as f:
             code = f.read()
             doctext.append(f"\\section*{{{basename(filename)}}}")
             doctext.append(highlight(code, CustomJavaLexer(), formatter))
@@ -173,7 +173,7 @@ def create_pdf(filenames, working_dir, silent=False):
     if sys.platform in ('linux', 'darwin'):
         cmd = [
             "latexmk", "-silent", "-pdf", "-shell-escape", "-file-line-error",
-            "-synctex=1", "-interaction=nonstopmode", tex_file
+            "-synctex=1", "-f", "-interaction=nonstopmode", tex_file
         ]
     elif sys.platform == 'win32':
         cmd = ["pdflatex", "-shell-escape", "-interaction=nonstopmode", tex_file]
