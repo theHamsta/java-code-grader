@@ -23,7 +23,7 @@ class CustomJavaLexer(JavaLexer):
             (r'[^\S\n]+', Text),
             # Our magic comments
             (r'///[\s]*(<-).*?\n', Generic.Error),
-            (r'//[\s]*\[.*:.*(points|Points)\]', Generic.Error),
+            (r'//[\s]*\[.*:.*(points|Points)?\]', Generic.Error),
             # Copied from JavaLexer
             (r'//.*?\n', Comment.Single),
             (r'/\*.*?\*/', Comment.Multiline),
