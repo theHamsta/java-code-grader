@@ -30,7 +30,7 @@ from pygments.formatters import LatexFormatter
 from code_grader.lexer import CustomJavaLexer
 
 SCORING_REGEX = re.compile(
-    r"//\s*\[(.*)\s*:\s*([0-9.,]+)\s*/\s*([0-9.,]+)\s*(point|Point)?s?\]")
+    r"//\s*\[(.*)\s*:\s*([0-9.,]+)\s*/\s*([0-9.,]+)\s*(point|Point|Punkten|Punkte)?s?\]")
 
 
 class ScoringResult:
