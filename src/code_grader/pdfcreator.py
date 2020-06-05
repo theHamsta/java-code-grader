@@ -14,7 +14,8 @@ import tempfile
 from glob import escape, glob
 from os.path import basename, dirname, exists, join
 import os
-from warnings import warn
+import shutil
+
 try:
     from rich import print
 except Exception:
@@ -170,13 +171,16 @@ def create_pdf(filenames, working_dir, silent=False):
         f.write(tex_code)
         tex_file = f.name
 
-    if sys.platform in ('linux', 'darwin'):
+    if shutil.which('latexmk'):
         cmd = [
             "latexmk", "-silent", "-pdf", "-shell-escape", "-file-line-error",
             "-synctex=1", "-f", "-interaction=nonstopmode", tex_file
         ]
-    elif sys.platform == 'win32':
+    elif shutil.which('pdflatex'):
         cmd = ["pdflatex", "-shell-escape", "-interaction=nonstopmode", tex_file]
+    else:
+        print('"pdflatex" or "latexmk" need to be in $PATH!!!')
+        exit(-1)
 
     print(f"Running \"{' '.join(cmd)}\" ...")
     subprocess.call(cmd, cwd=dirname(tex_file))
