@@ -4,7 +4,7 @@ Generate a PDF of graded source files as a feedback for students
 
 ## Installation
 
-- Please ensure that **latexmk** is in `$PATH`!
+- Please ensure that **latexmk** or **pdflatex** is in `$PATH`!
 - We use the `minted` and the `geometry` LaTeX package
 - Install this package
 ```bash
