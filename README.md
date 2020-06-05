@@ -26,6 +26,12 @@ code-grader Signal.java LinearFilter.java
 where `Signal.java` `LinearFilter.java` are Java source code files somewhere in the directory structure of current
 directory.
 
+Usually, you want to grade more than one student
+```bash
+# Will generate one PDF for each subdir of current working directory
+code-grader Signal.java LinearFilter.java --batch-grade
+```
+
 More options:
 
 ```bash
