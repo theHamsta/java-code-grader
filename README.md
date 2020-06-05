@@ -7,6 +7,11 @@ Generate a PDF of graded source files as a feedback for students
 - Please ensure that **latexmk** is in `$PATH`!
 - We use the `minted` and the `geometry` LaTeX package
 - Install this package
+```bash
+pip3 install code-grader
+```
+
+Or from this repo:
 
 ```bash
 pip3 install -e .
