@@ -148,7 +148,7 @@ def create_tex_file(filenames, working_dir):
 """).render(scoring.__dict__))
 
     for filename in relevant_files:
-        with open(filename, 'r'  , encoding="utf-8",errors="ignore") as f:
+        with open(filename, 'r', encoding="utf-8", errors="ignore") as f:
             code = f.read()
             doctext.append(f"\\section*{{{basename(filename)}}}")
             doctext.append(highlight(code, CustomJavaLexer(), formatter))
