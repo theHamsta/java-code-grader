@@ -122,7 +122,7 @@ def create_tex_file(filenames, working_dir):
   }
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{minted} 
+\usepackage{minted}
 
 \setlength{\parindent}{0cm}
 \renewcommand{\familydefault}{\sfdefault}
