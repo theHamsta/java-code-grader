@@ -160,7 +160,7 @@ def create_tex_file(filenames, working_dir):
 
 def create_pdf(filenames, working_dir, silent=False):
 
-    print(f"Creating LaTeX code...")
+    print("Creating LaTeX code...")
     tex_code, scoring = create_tex_file(filenames, working_dir)
 
     if not tex_code:
