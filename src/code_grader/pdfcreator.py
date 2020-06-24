@@ -198,7 +198,7 @@ def create_pdf(filenames, working_dir, silent=False):
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input_folder', default='.')
+    parser.add_argument('--input-folder', default='.')
     parser.add_argument('source_files', nargs='+')
     parser.add_argument('--language', default='java')
     parser.add_argument('--silent', action='store_true')
