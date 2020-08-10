@@ -1,3 +1,5 @@
+[![PyPI badge](https://badge.fury.io/py/code-grader.svg )](https://badge.fury.io/py/code-grader)
+
 # code-grader
 
 Generate a PDF of graded source files as a feedback for students
